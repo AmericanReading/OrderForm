@@ -1,4 +1,4 @@
 OrderForm
 =========
 
-PHP class for building order forms
+PHP library for building and working with order forms
