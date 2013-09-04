@@ -8,7 +8,7 @@ namespace AmericanReading\OrderForm;
  *
  * You must subclass OrderForm to provide methods for creating markup.
  */
-abstract class OrderForm
+class OrderForm
 {
     protected $data;
     protected $indexedArrays;
@@ -48,7 +48,6 @@ abstract class OrderForm
             $this->addToIndexedArray($indexField, $this->data, $arr);
             $this->indexedArrays[$indexField] = & $arr;
         }
-
         return $this->indexedArrays[$indexField];
     }
 
@@ -62,17 +61,33 @@ abstract class OrderForm
      */
     protected function addToIndexedArray($indexField, &$item, &$index)
     {
-        if (isset($item[$indexField])) {
-            $index[$item[$indexField]] = & $item;
-        }
+        if (is_array($item)) {
+            if (isset($item[$indexField])) {
+                $index[$item[$indexField]] = &$item;
+            }
 
-        if (isset($item['items'])
-            && is_array($item['items'])
-            && count($item['items']) > 0
-        ) {
-            foreach ($item['items'] as &$child) {
-                $this->addToIndexedArray($indexField, $child, $index);
+            if (isset($item['items'])
+                && is_array($item['items'])
+                && count($item['items']) > 0
+            ) {
+                foreach ($item['items'] as &$child) {
+                    $this->addToIndexedArray($indexField, $child, $index);
+                }
+            }
+        } elseif (is_object($item)) {
+            if (isset($item->{$indexField})) {
+                $index[$item->{$indexField}] = &$item;
+            }
+
+            if (isset($item->items)
+                && is_array($item->items)
+                && count($item->items) > 0
+            ) {
+                foreach ($item->items as &$child) {
+                    $this->addToIndexedArray($indexField, $child, $index);
+                }
             }
         }
+
     }
 }
